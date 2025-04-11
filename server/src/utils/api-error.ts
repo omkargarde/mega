@@ -13,7 +13,7 @@ class ApiError extends Error {
   public constructor(
     statusCode: number,
     message = "Something went wrong",
-    errors = [],
+    errors: unknown[] = [],
     stack = "",
   ) {
     super(message);

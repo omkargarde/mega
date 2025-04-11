@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-const userRegisterValidator = () => {
+const userRegistrationValidator = () => {
   return [
     body("email")
       .trim()
@@ -57,6 +57,6 @@ export {
   userChangeCurrentPasswordValidator,
   userForgotPasswordValidator,
   userLoginValidator,
-  userRegisterValidator,
+  userRegistrationValidator,
   userResetForgottenPasswordValidator,
 };
