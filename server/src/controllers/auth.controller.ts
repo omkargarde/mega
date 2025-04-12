@@ -3,6 +3,8 @@ import type { Request, Response } from "express";
 import crypto from "node:crypto";
 import { nextTick } from "node:process";
 
+import type { IHttpError } from "../types/http-error.type.ts";
+
 import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { UserModel } from "../models/user.model.ts";
 import { ApiError } from "../utils/api-error.util.ts";
@@ -24,10 +26,10 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     });
     if (existingUser) {
       return res
-        .status(HTTP_STATUS_CODES.CONFLICT)
+        .status(HTTP_STATUS_CODES.Conflict)
         .json(
           new ApiResponse(
-            HTTP_STATUS_CODES.CONFLICT,
+            HTTP_STATUS_CODES.Conflict,
             "",
             "User already exists",
           ),
@@ -51,13 +53,13 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!user) {
       throw new ApiError(
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        HTTP_STATUS_CODES.InternalServerError,
         "Failed to create user",
       );
     }
     if (!user.emailVerificationToken) {
       throw new ApiError(
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        HTTP_STATUS_CODES.InternalServerError,
         "Failed to create email verification token",
       );
     }
@@ -65,16 +67,19 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     await sendVerificationMail(user.email, user.emailVerificationToken);
 
     return res
-      .status(HTTP_STATUS_CODES.OK)
+      .status(HTTP_STATUS_CODES.Ok)
       .json(
         new ApiResponse(
-          HTTP_STATUS_CODES.OK,
+          HTTP_STATUS_CODES.Ok,
           "",
           "User Register Successfully, please verify your email",
         ),
       );
-  } catch (error: unknown) {
-    next(error);
+  } catch (error) {
+    const err = error as IHttpError;
+    return res
+      .status(err.statusCode)
+      .json(new ApiResponse(err.statusCode, "", err.message));
   }
 });
 
@@ -99,7 +104,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
 
     if (!user) {
       throw new ApiError(
-        HTTP_STATUS_CODES.BAD_REQUEST,
+        HTTP_STATUS_CODES.BadRequest,
         "Verification token does not exist or is expired",
       );
     }
@@ -109,15 +114,16 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
     await user.save();
 
     return res
-      .status(HTTP_STATUS_CODES.OK)
+      .status(HTTP_STATUS_CODES.Ok)
       .json(
-        new ApiResponse(HTTP_STATUS_CODES.OK, "", "User Email Successfully"),
+        new ApiResponse(HTTP_STATUS_CODES.Ok, "", "User Email Successfully"),
       );
   } catch (error) {
-    next(error);
+    const err = error as IHttpError;
+    return res
+      .status(err.statusCode)
+      .json(new ApiResponse(err.statusCode, "", err.message));
   }
-
-  //validation
 });
 
 const resendEmailVerification = asyncHandler(
