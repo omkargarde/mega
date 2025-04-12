@@ -11,7 +11,7 @@ class ApiError extends Error {
    * @param  stack - The error stack trace.
    */
   public constructor(
-    statusCode: number,
+    statusCode: number = 500,
     message: string = "Something went wrong",
     errors: unknown[] = [],
     stack: string = "",

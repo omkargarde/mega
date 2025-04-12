@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-import { AvailableUserRoles } from "../constants/user-constant.ts";
+import { AvailableUserRoles } from "../constants/user.constant.ts";
 
 const createProjectValidator = () => {
   return [

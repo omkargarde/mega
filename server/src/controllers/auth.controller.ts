@@ -2,13 +2,11 @@ import type { Request, Response } from "express";
 
 import crypto from "node:crypto";
 
-import {
-  HTTP_ERROR_MESSAGES,
-  HTTP_STATUS_CODES,
-} from "../constants/status.constant.ts";
+import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { UserModel } from "../models/user.model.ts";
-import { ApiResponse } from "../utils/api-response.ts";
-import { asyncHandler } from "../utils/async-handler.ts";
+import { ApiError } from "../utils/api-error.util.ts";
+import { ApiResponse } from "../utils/api-response.util.ts";
+import { asyncHandler } from "../utils/async-handler.util.ts";
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, username } = req.body as {
@@ -40,22 +38,34 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       new Date().getTime() + Number(process.env.REGISTRATION_TOKEN_EXPIRY ?? 0),
     );
 
-    const user = new UserModel.create({});
-  } catch (error: unknown) {
-    let data = "Something went wrong";
-    if (error instanceof Error) {
-      data = error.message;
+    const user = await UserModel.create({
+      email,
+      emailVerificationExpiry: tokenExpiry,
+      emailVerificationToken: token,
+      password,
+      username,
+    });
+    if (!user) {
+      return res
+        .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
+        .json(
+          new ApiResponse(
+            HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+            "",
+            "Failed to create user",
+          ),
+        );
     }
-
-    res
-      .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-          data,
-          HTTP_ERROR_MESSAGES.INTERNAL_SERVER_ERROR,
-        ),
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      throw new ApiError(
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        error.message,
+        [error.cause],
+        error.stack,
       );
+    }
+    throw new ApiError();
   }
 });
 
