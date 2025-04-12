@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 
 import crypto from "node:crypto";
+import { nextTick } from "node:process";
 
 import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { UserModel } from "../models/user.model.ts";
@@ -73,15 +74,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
         ),
       );
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      throw new ApiError(
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        error.message,
-        [error.cause],
-        error.stack,
-      );
-    }
-    throw new ApiError();
+    next(error);
   }
 });
 
@@ -121,15 +114,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
         new ApiResponse(HTTP_STATUS_CODES.OK, "", "User Email Successfully"),
       );
   } catch (error) {
-    if (error instanceof Error) {
-      throw new ApiError(
-        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-        error.message,
-        [error.cause],
-        error.stack,
-      );
-    }
-    throw new ApiError();
+    next(error);
   }
 
   //validation
