@@ -7,6 +7,7 @@ import { UserModel } from "../models/user.model.ts";
 import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
+import { sendVerificationMail } from "../utils/send-mail.util.ts";
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, username } = req.body as {
@@ -45,17 +46,32 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       password,
       username,
     });
+
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!user) {
-      return res
-        .status(HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR)
-        .json(
-          new ApiResponse(
-            HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
-            "",
-            "Failed to create user",
-          ),
-        );
+      throw new ApiError(
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        "Failed to create user",
+      );
     }
+    if (!user.emailVerificationToken) {
+      throw new ApiError(
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        "Failed to create email verification token",
+      );
+    }
+
+    await sendVerificationMail(user.email, user.emailVerificationToken);
+
+    return res
+      .status(HTTP_STATUS_CODES.OK)
+      .json(
+        new ApiResponse(
+          HTTP_STATUS_CODES.OK,
+          "",
+          "User Register Successfully, please verify your email",
+        ),
+      );
   } catch (error: unknown) {
     if (error instanceof Error) {
       throw new ApiError(
@@ -71,7 +87,18 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, role, username } = req.body;
-
+  try {
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new ApiError(
+        HTTP_STATUS_CODES.INTERNAL_SERVER_ERROR,
+        error.message,
+        [error.cause],
+        error.stack,
+      );
+    }
+    throw new ApiError();
+  }
   //validation
 });
 
