@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 import {
   AvailableTaskStatuses,
   taskStatusEnum,
-} from "../constants/task-constant.ts";
+} from "../constants/task.constant.ts";
 
 const taskSchema = new Schema(
   {
@@ -43,6 +43,6 @@ const taskSchema = new Schema(
   { timestamps: true },
 );
 
-const Task = mongoose.model("Task", taskSchema);
+const TaskModel = mongoose.model("TaskModel", taskSchema);
 
-export { Task };
+export { TaskModel };

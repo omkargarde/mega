@@ -6,9 +6,9 @@ class ApiError extends Error {
    * Construct an ApiError object.
    *
    * @param  statusCode - The HTTP status code for the error.
-   * @param  [message="Something went wrong"] - The error message.
-   * @param  [errors=[]] - An array of error objects.
-   * @param  [stack=""] - The error stack trace.
+   * @param  message - The error message.
+   * @param  errors - An array of error objects.
+   * @param  stack - The error stack trace.
    */
   public constructor(
     statusCode: number,
