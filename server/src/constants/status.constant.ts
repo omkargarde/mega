@@ -11,6 +11,7 @@ const HTTP_STATUS_CODES = {
   SERVICE_AVAILABLE: 200,
   SERVICE_UNAVAILABLE: 503,
   UNAUTHORIZED: 401,
+  UNPROCESSABLE_ENTITY: 422,
 };
 
 // HTTP Response Status Messages
@@ -34,6 +35,7 @@ const HTTP_ERROR_MESSAGES = {
   NOT_FOUND: "Resource not found",
   SERVICE_UNAVAILABLE: "Service unavailable",
   UNAUTHORIZED: "Authentication failed",
+  UNPROCESSABLE_ENTITY: "Unable to process request",
 };
 
 export { HTTP_ERROR_MESSAGES, HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES };

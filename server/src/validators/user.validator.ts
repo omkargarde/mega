@@ -7,7 +7,8 @@ const userRegistrationValidator = () => {
       .notEmpty()
       .withMessage("Email is required")
       .isEmail()
-      .withMessage("Email is invalid"),
+      .withMessage("Email is invalid")
+      .normalizeEmail(),
 
     body("username")
       .trim()
@@ -30,7 +31,11 @@ const userRegistrationValidator = () => {
 };
 const userLoginValidator = () => {
   return [
-    body("email").optional().isEmail().withMessage("Email is invalid"),
+    body("email")
+      .optional()
+      .isEmail()
+      .withMessage("Email is invalid")
+      .normalizeEmail(),
     body("username").optional(),
     body("password").notEmpty().withMessage("Password is required"),
   ];
@@ -49,7 +54,8 @@ const userForgotPasswordValidator = () => {
       .notEmpty()
       .withMessage("Email is required")
       .isEmail()
-      .withMessage("Email is invalid"),
+      .withMessage("Email is invalid")
+      .normalizeEmail(),
   ];
 };
 

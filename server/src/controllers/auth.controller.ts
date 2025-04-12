@@ -86,8 +86,40 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
+  //validation
+});
+
+const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, role, username } = req.body;
+
+  //validation
+});
+
+const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
+  const { token } = req.params;
+
   try {
+    const user = await UserModel.findOne({
+      emailVerificationExpiry: { $gt: Date.now() },
+      emailVerificationToken: token,
+    });
+
+    if (!user) {
+      throw new ApiError(
+        HTTP_STATUS_CODES.BAD_REQUEST,
+        "Verification token does not exist or is expired",
+      );
+    }
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpiry = null;
+    await user.save();
+
+    return res
+      .status(HTTP_STATUS_CODES.OK)
+      .json(
+        new ApiResponse(HTTP_STATUS_CODES.OK, "", "User Email Successfully"),
+      );
   } catch (error) {
     if (error instanceof Error) {
       throw new ApiError(
@@ -99,17 +131,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     }
     throw new ApiError();
   }
-  //validation
-});
-
-const logoutUser = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password, role, username } = req.body;
-
-  //validation
-});
-
-const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
-  const { email, password, role, username } = req.body;
 
   //validation
 });
