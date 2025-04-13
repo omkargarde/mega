@@ -1,15 +1,12 @@
 import type { Request, Response } from "express";
-
-import crypto from "node:crypto";
-
 import type { IHttpError } from "../types/http-error.type.ts";
-
+import crypto from 'node:crypto';
 import {
   HTTP_STATUS_CODES,
   HTTP_STATUS_MESSAGES,
 } from "../constants/status.constant.ts";
 import { UserModel } from "../models/user.model.ts";
-import { existingUser } from "../services/user/existing-user.service.ts";
+import {  UserDoesExist } from "../services/user/user.service.ts";
 import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
@@ -24,23 +21,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
   //validation
   try {
-    // const existingUser = await UserModel.findOne({
-    //   email,
-    // });
-    // if (existingUser) {
-    //   return res
-    //     .status(HTTP_STATUS_CODES.Conflict)
-    //     .json(
-    //       new ApiResponse(
-    //         HTTP_STATUS_CODES.Conflict,
-    //         "",
-    //         "User already exists",
-    //       ),
-    //     );
-    // }
-    const userDoesExist = await UserModel.findOne({
-      email: { $eq: email },
-    });
+    const userDoesExist = await UserDoesExist(email)
     if (userDoesExist) {
       return res
         .status(HTTP_STATUS_CODES.Conflict)
@@ -106,9 +87,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
     username: string | undefined;
   };
   try {
-    const userDoesExist = await UserModel.findOne({
-      email: { $eq: email },
-    });
+    const userDoesExist = await UserDoesExist(email)
     if (!userDoesExist) {
       return res
         .status(HTTP_STATUS_CODES.NotFound)
