@@ -1,7 +1,7 @@
 const taskStatusEnum = {
-  DONE: "done",
-  IN_PROGRESS: "in_progress",
-  TODO: "todo",
+  doesNotMatch: "done",
+  InProgress: "in_progress",
+  Todo: "todo",
 } as const;
 
 const AvailableTaskStatuses = Object.values(taskStatusEnum);

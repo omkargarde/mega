@@ -24,7 +24,7 @@ const HTTP_STATUS_CODES = {
   TooManyRequests: 429,
   Unauthorized: 401,
   UnprocessableEntity: 422,
-};
+} as const;
 
 // HTTP Response Status Messages
 const HTTP_STATUS_MESSAGES = {
@@ -36,7 +36,7 @@ const HTTP_STATUS_MESSAGES = {
   OK: "OK",
   ServiceAvailable: "Service available",
   Unauthorized: "Unauthorized",
-};
+} as const;
 
 // HTTP Response Error Messages
 const HTTP_ERROR_MESSAGES = {
@@ -48,6 +48,6 @@ const HTTP_ERROR_MESSAGES = {
   ServiceUnavailable: "Service unavailable",
   Unauthorized: "Authentication failed",
   UnprocessableEntity: "Unable to process request",
-};
+} as const;
 
 export { HTTP_ERROR_MESSAGES, HTTP_STATUS_CODES, HTTP_STATUS_MESSAGES };
