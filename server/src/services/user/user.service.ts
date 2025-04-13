@@ -1,5 +1,6 @@
 import { UserModel } from "../../models/user.model.ts";
 
+
 const FindUser = async (email: string) => {
   return await UserModel.findOne({
     email: { $eq: email },
@@ -40,3 +41,4 @@ const VerifyUser = async (userVerifiedEmail: unknown) => {
 };
 
 export { CreateUser, FindUser, VerifyEmailToken, VerifyUser };
+

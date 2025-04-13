@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 
+
 import type { IHttpError } from "../types/http-error.type.ts";
 
 import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
@@ -18,6 +19,7 @@ import {
   VerifyEmailToken,
   VerifyUser,
 } from "../services/user/user.service.ts";
+
 import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
@@ -33,6 +35,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   //validation
   try {
     const userDoesExist = await FindUser(email);
+
     if (userDoesExist) {
       return res
         .status(HTTP_STATUS_CODES.Conflict)
@@ -94,6 +97,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   try {
     const user = await FindUser(email);
     if (!user) {
+
       return res
         .status(HTTP_STATUS_CODES.Unauthorized)
         .json(
