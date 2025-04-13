@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["healthcheck"]
+  "cSpell.words": ["healthcheck"],
+  "typescript.tsdk": "node_modules/typescript/lib"
 }

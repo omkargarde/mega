@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 import jwt, { type Secret } from "jsonwebtoken";
 import mongoose, { Schema } from "mongoose";
+import crypto from "node:crypto";
 
 import {
   AvailableUserRoles,
@@ -62,7 +62,7 @@ const userSchema = new Schema(
       type: String,
     },
     role: {
-      default: userRolesEnum.MEMBER,
+      default: userRolesEnum.Member,
       enum: AvailableUserRoles,
       type: String,
     },
@@ -99,9 +99,7 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username as string,
     },
     process.env.ACCESS_TOKEN_SECRET as Secret,
-    {
-      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
-    },
+    { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRY) },
   );
 };
 
