@@ -88,8 +88,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (password: string) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password as string);
 };
 
 userSchema.methods.generateAccessToken = function () {
@@ -100,8 +99,9 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username as string,
     },
     process.env.ACCESS_TOKEN_SECRET as Secret,
-
-    { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRY) },
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
   );
 };
 

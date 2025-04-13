@@ -1,12 +1,15 @@
 import type { Request, Response } from "express";
 
 import crypto from "node:crypto";
-import { nextTick } from "node:process";
 
 import type { IHttpError } from "../types/http-error.type.ts";
 
-import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
+import {
+  HTTP_STATUS_CODES,
+  HTTP_STATUS_MESSAGES,
+} from "../constants/status.constant.ts";
 import { UserModel } from "../models/user.model.ts";
+import { existingUser } from "../services/user/existing-user.service.ts";
 import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
@@ -16,15 +19,29 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, username } = req.body as {
     email: string;
     password: string;
-    username: string;
+    username: string | undefined;
   };
 
   //validation
   try {
-    const existingUser = await UserModel.findOne({
+    // const existingUser = await UserModel.findOne({
+    //   email,
+    // });
+    // if (existingUser) {
+    //   return res
+    //     .status(HTTP_STATUS_CODES.Conflict)
+    //     .json(
+    //       new ApiResponse(
+    //         HTTP_STATUS_CODES.Conflict,
+    //         "",
+    //         "User already exists",
+    //       ),
+    //     );
+    // }
+    const userDoesExist = await UserModel.findOne({
       email,
     });
-    if (existingUser) {
+    if (userDoesExist) {
       return res
         .status(HTTP_STATUS_CODES.Conflict)
         .json(
@@ -77,14 +94,37 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       );
   } catch (error) {
     const err = error as IHttpError;
-    return res
-      .status(err.statusCode)
-      .json(new ApiResponse(err.statusCode, "", err.message));
+    const status = err.statusCode ?? 500;
+    return res.status(status).json(new ApiResponse(status, "", err.message));
   }
 });
 
 const loginUser = asyncHandler(async (req: Request, res: Response) => {
-  //validation
+  const { email, password, username } = req.body as {
+    email: string;
+    password: string;
+    username: string | undefined;
+  };
+  try {
+    const userDoesExist = await UserModel.findOne({
+      email,
+    });
+    if (!userDoesExist) {
+      return res
+        .status(HTTP_STATUS_CODES.NotFound)
+        .json(
+          new ApiResponse(
+            HTTP_STATUS_CODES.NotFound,
+            "",
+            HTTP_STATUS_MESSAGES.NotFound,
+          ),
+        );
+    }
+  } catch (error) {
+    const err = error as IHttpError;
+    const status = err.statusCode ?? 500;
+    return res.status(status).json(new ApiResponse(status, "", err.message));
+  }
 });
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
@@ -120,9 +160,8 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
       );
   } catch (error) {
     const err = error as IHttpError;
-    return res
-      .status(err.statusCode)
-      .json(new ApiResponse(err.statusCode, "", err.message));
+    const status = err.statusCode ?? 500;
+    return res.status(status).json(new ApiResponse(status, "", err.message));
   }
 });
 

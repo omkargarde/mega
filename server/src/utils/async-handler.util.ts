@@ -20,6 +20,7 @@ export function asyncHandler(
   return function (req: Request, res: Response, next: NextFunction) {
     Promise.resolve(requestHandler(req, res)).catch(function (err: unknown) {
       if (err instanceof Error) next(err);
+      next(err);
     });
   };
 }
