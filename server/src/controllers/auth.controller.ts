@@ -55,7 +55,6 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
       username,
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!user) {
       throw new ApiError(
         HTTP_STATUS_CODES.InternalServerError,
