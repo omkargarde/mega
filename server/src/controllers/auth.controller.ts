@@ -39,7 +39,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
     //     );
     // }
     const userDoesExist = await UserModel.findOne({
-      email,
+      email: { $eq: email },
     });
     if (userDoesExist) {
       return res
