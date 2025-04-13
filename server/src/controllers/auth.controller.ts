@@ -1,7 +1,5 @@
 import type { Request, Response } from "express";
 
-import type { IHttpError } from "../types/http-error.type.ts";
-
 import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { TOKEN_ENUM } from "../constants/token.constant.ts";
 import { USER_MESSAGES } from "../constants/user.constant.ts";
@@ -18,7 +16,6 @@ import {
   VerifyEmailToken,
   VerifyUser,
 } from "../services/user/user.service.ts";
-import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
 import {
