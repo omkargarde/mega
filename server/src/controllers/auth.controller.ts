@@ -21,6 +21,12 @@ import {
 import { ApiError } from "../utils/api-error.util.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
 import { asyncHandler } from "../utils/async-handler.util.ts";
+import {
+  BadRequestException,
+  ConflictException,
+  InternalServerErrorException,
+  UnauthorizedException,
+} from "../utils/exception.util.ts";
 import { sendVerificationMail } from "../utils/send-mail.util.ts";
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -31,15 +37,7 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
   };
   const userDoesExist = await FindUser(email);
   if (userDoesExist) {
-    return res
-      .status(HTTP_STATUS_CODES.Conflict)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.Conflict,
-          "",
-          USER_MESSAGES.UserExists,
-        ),
-      );
+    throw new ConflictException(USER_MESSAGES.UserExists);
   }
 
   const token = UnHashedToken();
@@ -48,15 +46,11 @@ const registerUser = asyncHandler(async (req: Request, res: Response) => {
 
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!user) {
-    throw new ApiError(
-      HTTP_STATUS_CODES.InternalServerError,
-      "Failed to create user",
-    );
+    throw new InternalServerErrorException(USER_MESSAGES.FailedUserCreation);
   }
   if (!user.emailVerificationToken) {
-    throw new ApiError(
-      HTTP_STATUS_CODES.InternalServerError,
-      USER_MESSAGES.FailedUserCreation,
+    throw new InternalServerErrorException(
+      USER_MESSAGES.FailedUserTokenCreation,
     );
   }
 
@@ -80,38 +74,14 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   };
   const user = await FindUser(email);
   if (!user) {
-    return res
-      .status(HTTP_STATUS_CODES.Unauthorized)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.Unauthorized,
-          "qwe",
-          USER_MESSAGES.CredFailed,
-        ),
-      );
+    throw new UnauthorizedException(USER_MESSAGES.CredFailed);
   }
   if (!user.isEmailVerified) {
-    return res
-      .status(HTTP_STATUS_CODES.Unauthorized)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.Unauthorized,
-          "asd",
-          USER_MESSAGES.EmailNotVerified,
-        ),
-      );
+    throw new UnauthorizedException(USER_MESSAGES.EmailNotVerified);
   }
   const isPasswordCorrect = await ComparePassword(password, user.password);
   if (!isPasswordCorrect) {
-    return res
-      .status(HTTP_STATUS_CODES.Unauthorized)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.Unauthorized,
-          "zxc",
-          USER_MESSAGES.EmailNotVerified,
-        ),
-      );
+    throw new UnauthorizedException(USER_MESSAGES.CredFailed);
   }
 
   const accessToken = GenerateAccessToken(user._id, user.email, user.username);
@@ -134,15 +104,7 @@ const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
   const { token } = req.params;
   const userVerifiedEmail = await VerifyEmailToken(token ?? "");
   if (!userVerifiedEmail) {
-    return res
-      .status(HTTP_STATUS_CODES.BadRequest)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.BadRequest,
-          "",
-          USER_MESSAGES.BadEmailToken,
-        ),
-      );
+    throw new BadRequestException(USER_MESSAGES.BadEmailToken);
   }
   if (await VerifyUser(userVerifiedEmail)) {
     return res
