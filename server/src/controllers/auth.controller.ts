@@ -107,7 +107,7 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
   };
   try {
     const userDoesExist = await UserModel.findOne({
-      email,
+      email: { $eq: email },
     });
     if (!userDoesExist) {
       return res
