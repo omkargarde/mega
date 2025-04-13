@@ -6,7 +6,7 @@ import mongoose, { Schema } from "mongoose";
 import {
   AvailableUserRoles,
   userRolesEnum,
-} from "../constants/user-constant.ts";
+} from "../constants/user.constant.ts";
 
 const userSchema = new Schema(
   {
@@ -50,6 +50,7 @@ const userSchema = new Schema(
       type: Boolean,
     },
     password: {
+      min: 6,
       //mongoose DB level error handling example, but i do not known weather i like this or not
       // TODO: revisit this later
       required: [true, "Password is required"],
@@ -87,8 +88,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.methods.isPasswordCorrect = async function (password: string) {
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-  return await bcrypt.compare(password, this.password);
+  return await bcrypt.compare(password, this.password as string);
 };
 
 userSchema.methods.generateAccessToken = function () {
@@ -99,8 +99,9 @@ userSchema.methods.generateAccessToken = function () {
       username: this.username as string,
     },
     process.env.ACCESS_TOKEN_SECRET as Secret,
-
-    { expiresIn: Number(process.env.ACCESS_TOKEN_EXPIRY) },
+    {
+      expiresIn: process.env.ACCESS_TOKEN_EXPIRY,
+    },
   );
 };
 
@@ -128,6 +129,6 @@ userSchema.methods.generateTemporaryToken = function () {
   return { hashedToken, tokenExpiry, unHashedToken };
 };
 
-const User = mongoose.model("User", userSchema);
+const UserModel = mongoose.model("UserModel", userSchema);
 
-export { User };
+export { UserModel };

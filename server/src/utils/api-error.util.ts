@@ -5,16 +5,16 @@ class ApiError extends Error {
   /**
    * Construct an ApiError object.
    *
-   * @param {number} statusCode - The HTTP status code for the error.
-   * @param {string} [message="Something went wrong"] - The error message.
-   * @param {Error[]} [errors=[]] - An array of error objects.
-   * @param {string} [stack=""] - The error stack trace.
+   * @param  statusCode - The HTTP status code for the error.
+   * @param  message - The error message.
+   * @param  errors - An array of error objects.
+   * @param  stack - The error stack trace.
    */
   public constructor(
-    statusCode: number,
-    message = "Something went wrong",
+    statusCode: number = 500,
+    message: string = "Something went wrong",
     errors: unknown[] = [],
-    stack = "",
+    stack: string = "",
   ) {
     super(message);
     this.statusCode = statusCode;

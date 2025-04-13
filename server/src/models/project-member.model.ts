@@ -3,7 +3,7 @@ import mongoose, { Schema } from "mongoose";
 import {
   AvailableUserRoles,
   userRolesEnum,
-} from "../constants/user-constant.ts";
+} from "../constants/user.constant.ts";
 
 const projectMemberSchema = new Schema(
   {
@@ -26,6 +26,9 @@ const projectMemberSchema = new Schema(
   { timestamps: true },
 );
 
-const ProjectMember = mongoose.model("ProjectMember", projectMemberSchema);
+const ProjectMemberModel = mongoose.model(
+  "ProjectMemberModel",
+  projectMemberSchema,
+);
 
-export { ProjectMember };
+export { ProjectMemberModel };

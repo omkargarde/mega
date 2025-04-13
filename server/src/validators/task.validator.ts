@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-import { AvailableTaskStatuses } from "../constants/task-constant.ts";
+import { AvailableTaskStatuses } from "../constants/task.constant.ts";
 
 const createTaskValidator = () => {
   return [
