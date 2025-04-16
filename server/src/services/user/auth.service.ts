@@ -3,6 +3,8 @@ import type { Types } from "mongoose";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "node:crypto";
+
+import { ApiError } from "../../utils/api-error.util.ts";
 const ComparePassword = async (password: string, hashedPassword: string) => {
   return await bcrypt.compare(password, hashedPassword);
 };
@@ -12,16 +14,19 @@ const GenerateAccessToken = (
   email: string,
   username: string,
 ) => {
+  const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET ?? "test";
+  const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY ?? "1d";
+  if (!ACCESS_TOKEN_SECRET || !ACCESS_TOKEN_EXPIRY) {
+    throw new ApiError(500, "access token or expiry not set up");
+  }
   return jwt.sign(
     {
       _id: id,
       email: email,
       username: username,
     },
-
-    process.env.ACCESS_TOKEN_SECRET ?? "test",
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    { expiresIn: (process.env.ACCESS_TOKEN_EXPIRY as string) ?? "1d" },
+    ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_EXPIRY },
   );
 };
 

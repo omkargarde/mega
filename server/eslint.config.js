@@ -11,7 +11,7 @@ import tseslint from "typescript-eslint";
 
 export default defineConfig([
   {
-    files: ["**/*.{ts}"],
+    files: ["src/**/*.ts", "**/*.{ts}"],
     languageOptions: {
       globals: globals.node,
       parserOptions: {
