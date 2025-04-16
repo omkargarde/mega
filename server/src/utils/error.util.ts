@@ -36,23 +36,47 @@ class ApiError extends Error {
 }
 
 class BadRequestException extends ApiError {
+  /**
+   * Construct a BadRequestException object.
+   *
+   * @param  message - The error message for the exception. Defaults to a generic
+   *                   message for bad requests.
+   */
   constructor(message: string = HTTP_ERROR_MESSAGES.BadRequest) {
     super(HTTP_STATUS_CODES.BadRequest, message);
   }
 }
 
 class ConflictException extends ApiError {
+  /**
+   * Construct a ConflictException object.
+   *
+   * @param  message - The error message for the exception. Defaults to a generic
+   *                   message for conflicts.
+   */
   constructor(message: string = HTTP_ERROR_MESSAGES.Conflict) {
     super(HTTP_STATUS_CODES.Conflict, message);
   }
 }
 
 class InternalServerErrorException extends ApiError {
+  /**
+   * Construct an InternalServerErrorException object.
+   *
+   * @param  message - The error message for the exception. Defaults to a generic
+   *                   message for internal server errors.
+   */
   constructor(message: string = HTTP_ERROR_MESSAGES.InternalServerError) {
     super(HTTP_STATUS_CODES.InternalServerError, message);
   }
 }
 class UnauthorizedException extends ApiError {
+  /**
+   * Construct an UnauthorizedException object.
+   *
+   * @param  message - The error message for the exception. Defaults to a generic
+   *                   message for unauthorized requests.
+   */
   constructor(message: string = HTTP_ERROR_MESSAGES.Unauthorized) {
     super(HTTP_STATUS_CODES.Unauthorized, message);
   }
