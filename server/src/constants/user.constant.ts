@@ -8,6 +8,7 @@ const AvailableUserRoles = Object.values(userRolesEnum);
 
 const USER_MESSAGES = {
   BadEmailToken: "Verification token does not exist or is expired",
+  BadToken: "Token is invalid",
   CredFailed: "Email or Password is incorrect",
   credSuccess: "User login successful",
   EmailNotVerified: "Email is not verified",

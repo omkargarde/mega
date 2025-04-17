@@ -1,10 +1,12 @@
 import type { Types } from "mongoose";
 
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload } from "jsonwebtoken";
 import crypto from "node:crypto";
 
-import { ApiError } from "../../utils/api-error.util.ts";
+import { HTTP_STATUS_CODES } from "../../constants/status.constant.ts";
+import { ApiError } from "../../utils/error.util.ts";
+
 const ComparePassword = async (password: string, hashedPassword: string) => {
   return await bcrypt.compare(password, hashedPassword);
 };
@@ -17,7 +19,10 @@ const GenerateAccessToken = (
   const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET ?? "test";
   const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY ?? "1d";
   if (!ACCESS_TOKEN_SECRET || !ACCESS_TOKEN_EXPIRY) {
-    throw new ApiError(500, "access token or expiry not set up");
+    throw new ApiError(
+      HTTP_STATUS_CODES.NotFound,
+      "access token or expiry not set up",
+    );
   }
   return jwt.sign(
     {
@@ -30,6 +35,10 @@ const GenerateAccessToken = (
   );
 };
 
+const VerifyToken = (token: string) => {
+  const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET ?? "test";
+  return jwt.verify(token, ACCESS_TOKEN_SECRET);
+};
 const UnHashedToken = () => {
   return crypto.randomBytes(20).toString("hex");
 };
@@ -53,4 +62,5 @@ export {
   HashedToken,
   TokenExpiry,
   UnHashedToken,
+  VerifyToken,
 };

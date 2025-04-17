@@ -23,7 +23,7 @@ import {
   ConflictException,
   InternalServerErrorException,
   UnauthorizedException,
-} from "../utils/exception.util.ts";
+} from "../utils/error.util.ts";
 import { sendVerificationMail } from "../utils/send-mail.util.ts";
 
 const registerUser = asyncHandler(async (req: Request, res: Response) => {
@@ -93,8 +93,6 @@ const loginUser = asyncHandler(async (req: Request, res: Response) => {
 
 const logoutUser = asyncHandler(async (req: Request, res: Response) => {
   const { email, password, role, username } = req.body;
-
-  //validation
 });
 
 const verifyEmail = asyncHandler(async (req: Request, res: Response) => {
