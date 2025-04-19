@@ -15,7 +15,7 @@ import {
   HTTP_STATUS_CODES,
   HTTP_STATUS_MESSAGES,
 } from "../constants/status.constant.ts";
-import { USER_MESSAGES } from "../constants/user.constant.ts";
+import { USER_MESSAGES, UserToken } from "../constants/user.constant.ts";
 import { UserModel } from "../models/user.model.ts";
 import { sendVerificationTokenMail } from "../services/mail.service.ts";
 import {
@@ -130,7 +130,7 @@ const loginUser = async (req: Request, res: Response) => {
   const cookieOptions: CookieOptions = GetJwtCookieOptions();
 
   // Set cookie before sending response
-  res.cookie("token", token, cookieOptions);
+  res.cookie(UserToken.token, token, cookieOptions);
 
   // Log headers to verify cookie is set
   // Send response
@@ -163,7 +163,7 @@ const getMe = async (req: ICustomRequest, res: Response) => {
     .json(new ApiResponse(HTTP_STATUS_CODES.Ok, user, USER_MESSAGES.UserFound));
 };
 
-const logoutUser = (req, res) => {
+const logoutUser = (req: Request, res: Response) => {
   try {
     // Clear the token cookie
     res.cookie("token", "", {

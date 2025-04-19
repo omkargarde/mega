@@ -4,6 +4,8 @@ const userRolesEnum = {
   ProjectAdmin: "project_admin",
 } as const;
 
+const UserToken = { token: "token" } as const;
+
 const AvailableUserRoles = Object.values(userRolesEnum);
 
 const USER_MESSAGES = {
@@ -23,4 +25,4 @@ const USER_MESSAGES = {
   VerifiedUserEmail: "User email verified",
 } as const;
 
-export { AvailableUserRoles, USER_MESSAGES, userRolesEnum };
+export { AvailableUserRoles, USER_MESSAGES, userRolesEnum, UserToken };
