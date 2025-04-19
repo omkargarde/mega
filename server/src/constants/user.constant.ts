@@ -15,7 +15,11 @@ const USER_MESSAGES = {
   FailedUserCreation: "Failed to create user",
   FailedUserTokenCreation: "Failed to create email verification token",
   SucceededUserCreation: "User register successfully, Please verify your email",
+  TokenNotFound: "Token not found",
+  UserConflict: "User already exists",
   UserExists: "User already exists",
+  UserFound: "User found",
+  UserNotFound: "User not found",
   VerifiedUserEmail: "User email verified",
 } as const;
 

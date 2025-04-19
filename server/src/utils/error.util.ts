@@ -6,14 +6,6 @@ class ApiError extends Error {
   protected errors;
   protected statusCode: number;
   protected success = false;
-  /**
-   * Construct an ApiError object.
-   *
-   * @param  statusCode - The HTTP status code for the error.
-   * @param  message - The error message.
-   * @param  errors - An array of error objects.
-   * @param  stack - The error stack trace.
-   */
   public constructor(
     statusCode: number = 500,
     message: string = "Something went wrong",
@@ -36,61 +28,48 @@ class ApiError extends Error {
 }
 
 class BadRequestException extends ApiError {
-  /**
-   * Construct a BadRequestException object.
-   *
-   * @param  message - The error message for the exception. Defaults to a generic
-   *                   message for bad requests.
-   */
-  constructor(message: string = HTTP_ERROR_MESSAGES.BadRequest) {
-    super(HTTP_STATUS_CODES.BadRequest, message);
+  constructor(
+    message: string = HTTP_ERROR_MESSAGES.BadRequest,
+    error?: unknown,
+  ) {
+    super(HTTP_STATUS_CODES.BadRequest, message, [error]);
   }
 }
 
 class ConflictException extends ApiError {
-  /**
-   * Construct a ConflictException object.
-   *
-   * @param  message - The error message for the exception. Defaults to a generic
-   *                   message for conflicts.
-   */
-  constructor(message: string = HTTP_ERROR_MESSAGES.Conflict) {
-    super(HTTP_STATUS_CODES.Conflict, message);
+  constructor(message: string = HTTP_ERROR_MESSAGES.Conflict, error?: unknown) {
+    super(HTTP_STATUS_CODES.Conflict, message, [error]);
   }
 }
 
 class InternalServerErrorException extends ApiError {
-  /**
-   * Construct an InternalServerErrorException object.
-   *
-   * @param  message - The error message for the exception. Defaults to a generic
-   *                   message for internal server errors.
-   */
-  constructor(message: string = HTTP_ERROR_MESSAGES.InternalServerError) {
-    super(HTTP_STATUS_CODES.InternalServerError, message);
+  constructor(
+    message: string = HTTP_ERROR_MESSAGES.InternalServerError,
+    error?: unknown,
+  ) {
+    super(HTTP_STATUS_CODES.InternalServerError, message, [error]);
   }
 }
 class NotFoundException extends ApiError {
-  /**
-   * Construct an UnauthorizedException object.
-   *
-   * @param  message - The error message for the exception. Defaults to a generic
-   *                   message for unauthorized requests.
-   */
-  constructor(message: string = HTTP_ERROR_MESSAGES.Unauthorized) {
-    super(HTTP_STATUS_CODES.Unauthorized, message);
+  constructor(
+    message: string = HTTP_ERROR_MESSAGES.Unauthorized,
+    error?: unknown,
+  ) {
+    super(HTTP_STATUS_CODES.Unauthorized, message, [error]);
   }
 }
 
 class UnauthorizedException extends ApiError {
-  /**
-   * Construct an UnauthorizedException object.
-   *
-   * @param  message - The error message for the exception. Defaults to a generic
-   *                   message for unauthorized requests.
-   */
-  constructor(message: string = HTTP_ERROR_MESSAGES.NotFound) {
-    super(HTTP_STATUS_CODES.NotFound, message);
+  constructor(message: string = HTTP_ERROR_MESSAGES.NotFound, error?: unknown) {
+    super(HTTP_STATUS_CODES.NotFound, message, [error]);
+  }
+}
+class UnprocessableEntityException extends ApiError {
+  constructor(
+    message: string = HTTP_ERROR_MESSAGES.UnprocessableEntity,
+    error?: unknown,
+  ) {
+    super(HTTP_STATUS_CODES.UnprocessableEntity, message, [error]);
   }
 }
 export {
@@ -100,4 +79,5 @@ export {
   InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
+  UnprocessableEntityException,
 };
