@@ -7,7 +7,7 @@
     "start": "node --experimental-strip-types --env-file=.env src/index.ts",
     "dev": "node --watch --experimental-strip-types --env-file=.env src/index.ts",
     "lint": "eslint --cache .",
-    "lint:strict": "eslint .",
+    "lint:strict": "eslint  .",
     "lint:fix": "eslint --cache --fix ."
   },
   "devDependencies": {
@@ -24,6 +24,7 @@
     "@typescript-eslint/parser": "^8.29.1",
     "eslint": "^9.24.0",
     "eslint-plugin-perfectionist": "^4.11.0",
+    "eslint-config-prettier": "^10.1.2",
     "express-validator": "7.2.1",
     "globals": "^16.0.0",
     "prettier": "^3.5.3",

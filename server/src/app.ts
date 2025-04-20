@@ -1,8 +1,8 @@
 import cors from "cors";
 import express, { urlencoded } from "express";
 
-import { authRouter } from "./routes/user.route.ts";
 import { healthCheckRouter } from "./routes/health-check.route.ts";
+import { authRouter } from "./routes/user.route.ts";
 const app = express();
 
 app.use(express.json());

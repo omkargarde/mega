@@ -1,5 +1,5 @@
 import eslint from "@eslint/js";
-import stylistic from "@stylistic/eslint-plugin";
+import eslintConfigPrettier from "eslint-config-prettier/flat";
 import perfectionist from "eslint-plugin-perfectionist";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
@@ -15,12 +15,6 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
-    plugins: {
-      "@stylistic": stylistic,
-    },
-    typescript: {
-      tsconfigPath: "./tsconfig.json",
-    },
   },
 
   eslint.configs.recommended,
@@ -34,4 +28,5 @@ export default defineConfig([
     },
   },
   perfectionist.configs["recommended-natural"],
+  eslintConfigPrettier,
 ]);

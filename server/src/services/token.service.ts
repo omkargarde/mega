@@ -13,7 +13,7 @@ const ComparePassword = async (password: string, hashedPassword: string) => {
 const GenerateAccessToken = (
   id: Types.ObjectId,
   email: string,
-  username: string,
+  username: string
 ) => {
   return jwt.sign(
     {
@@ -23,7 +23,7 @@ const GenerateAccessToken = (
     },
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     process.env.JWT_SECRET!,
-    { expiresIn: process.env.JWT_EXPIRE_TIME },
+    { expiresIn: process.env.JWT_EXPIRE_TIME }
   );
 };
 
@@ -50,8 +50,19 @@ const GetJwtCookieOptions = () => {
   };
 };
 
+const FlushJwtCookieOptions = () => {
+  return {
+    expires: new Date(0), // This will make the cookie expire immediately
+    httpOnly: false,
+    path: "/",
+    sameSite: "lax" as TSameSite,
+    secure: false,
+  };
+};
+
 export {
   ComparePassword,
+  FlushJwtCookieOptions,
   GenerateAccessToken,
   GetJwtCookieOptions,
   HashedToken,

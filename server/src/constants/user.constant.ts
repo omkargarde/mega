@@ -21,6 +21,7 @@ const USER_MESSAGES = {
   UserConflict: "User already exists",
   UserExists: "User already exists",
   UserFound: "User found",
+  UserLoggedOut: "User logout success",
   UserNotFound: "User not found",
   VerifiedUserEmail: "User email verified",
 } as const;

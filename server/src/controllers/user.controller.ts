@@ -6,19 +6,14 @@ import crypto from "crypto";
 import nodemailer from "nodemailer";
 
 import type { ICustomRequest } from "../types/custom-request.types.ts";
-import type {
-  ILoginUserRequestBody,
-  IRegisterUserRequestBody,
-} from "../types/user.type.ts";
+import type { IUserRequestBody } from "../types/user.type.ts";
 
-import {
-  HTTP_STATUS_CODES,
-  HTTP_STATUS_MESSAGES,
-} from "../constants/status.constant.ts";
+import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { USER_MESSAGES, UserToken } from "../constants/user.constant.ts";
 import { UserModel } from "../models/user.model.ts";
 import { sendVerificationTokenMail } from "../services/mail.service.ts";
 import {
+  FlushJwtCookieOptions,
   GenerateAccessToken,
   GetJwtCookieOptions,
 } from "../services/token.service.ts";
@@ -37,7 +32,7 @@ import {
 
 const registerUser = async (req: Request, res: Response) => {
   //register user
-  const { email, name, password } = req.body as IRegisterUserRequestBody;
+  const { email, name, password } = req.body as IUserRequestBody;
 
   try {
     const existingUser = await UserModel.findOne({ email });
@@ -69,13 +64,13 @@ const registerUser = async (req: Request, res: Response) => {
         new ApiResponse(
           HTTP_STATUS_CODES.Ok,
           "",
-          USER_MESSAGES.SucceededUserCreation,
-        ),
+          USER_MESSAGES.SucceededUserCreation
+        )
       );
   } catch (error) {
     throw new UnprocessableEntityException(
       USER_MESSAGES.FailedUserCreation,
-      error,
+      error
     );
   }
 };
@@ -100,8 +95,8 @@ const verifyUser = async (req: Request, res: Response) => {
         new ApiResponse(
           HTTP_STATUS_CODES.Ok,
           "",
-          USER_MESSAGES.VerifiedUserEmail,
-        ),
+          USER_MESSAGES.VerifiedUserEmail
+        )
       );
   } catch (error) {
     throw new BadRequestException(USER_MESSAGES.BadEmailToken, error);
@@ -109,7 +104,7 @@ const verifyUser = async (req: Request, res: Response) => {
 };
 
 const loginUser = async (req: Request, res: Response) => {
-  const { email, password } = req.body as ILoginUserRequestBody;
+  const { email, password } = req.body as IUserRequestBody;
   const user = await UserModel.findOne({ email });
   if (!user) {
     return res.status(400).json({
@@ -126,14 +121,10 @@ const loginUser = async (req: Request, res: Response) => {
 
   const token = GenerateAccessToken(user._id, user.email, user.username);
 
-  // Set cookie with minimal options for testing
   const cookieOptions: CookieOptions = GetJwtCookieOptions();
 
-  // Set cookie before sending response
   res.cookie(UserToken.token, token, cookieOptions);
 
-  // Log headers to verify cookie is set
-  // Send response
   const returnUser = {
     email: user.email,
     id: user._id,
@@ -146,8 +137,8 @@ const loginUser = async (req: Request, res: Response) => {
       new ApiResponse(
         HTTP_STATUS_CODES.Ok,
         returnUser,
-        HTTP_STATUS_MESSAGES.OK,
-      ),
+        USER_MESSAGES.credSuccess
+      )
     );
 };
 
@@ -164,32 +155,20 @@ const getMe = async (req: ICustomRequest, res: Response) => {
 };
 
 const logoutUser = (req: Request, res: Response) => {
-  try {
-    // Clear the token cookie
-    res.cookie("token", "", {
-      expires: new Date(0), // This will make the cookie expire immediately
-      httpOnly: false,
-      path: "/",
-      sameSite: "lax",
-      secure: false,
-    });
+  // Clear the token cookie
+  const cookieOptions = FlushJwtCookieOptions();
+  res.cookie("token", "", cookieOptions);
 
-    res.status(200).json({
-      message: "Logged out successfully",
-      success: true,
-    });
-  } catch (error) {
-    console.error("Logout error:", error);
-    res.status(500).json({
-      message: "Error during logout",
-      success: false,
-    });
-  }
+  res
+    .status(HTTP_STATUS_CODES.Ok)
+    .json(
+      new ApiResponse(HTTP_STATUS_CODES.Ok, "", USER_MESSAGES.UserLoggedOut)
+    );
 };
 
-const forgotPassword = async (req, res) => {
+const forgotPassword = async (req: Request, res: Response) => {
   //get user by email and send reset token
-  const { email } = req.body;
+  const { email } = req.body as IUserRequestBody;
   if (!email) {
     return res.status(400).json({
       message: "Email is required",

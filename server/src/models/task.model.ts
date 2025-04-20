@@ -30,7 +30,7 @@ const taskSchema = new Schema(
       type: Schema.Types.ObjectId,
     },
     status: {
-      default: taskStatusEnum.TODO,
+      default: taskStatusEnum.Todo,
       enum: AvailableTaskStatuses,
       type: String,
     },

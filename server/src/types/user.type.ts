@@ -1,8 +1,7 @@
-interface ILoginUserRequestBody {
+interface IUserRequestBody {
   email: string;
+  name: string;
   password: string;
 }
-interface IRegisterUserRequestBody extends ILoginUserRequestBody {
-  name: string;
-}
-export type { ILoginUserRequestBody, IRegisterUserRequestBody };
+
+export type { IUserRequestBody };
