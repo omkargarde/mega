@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from "express";
 
 import { validationResult } from "express-validator";
 
-import { ApiError } from "../utils/api-error.util.ts";
+import { ApiError } from "../utils/error.util.ts";
 
 export const validate = (req: Request, res: Response, next: NextFunction) => {
   const errors = validationResult(req);

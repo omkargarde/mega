@@ -9,7 +9,7 @@ const sendVerificationMail = async (email: string, token: string) => {
       pass: process.env.MAIL_PASSWORD,
       user: process.env.MAIL_USERNAME,
     },
-    secure: process.env.IS_PROD ? true : false,
+    secure: !!process.env.IS_PROD,
     service: process.env.MAIL_HOST,
   });
 

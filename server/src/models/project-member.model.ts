@@ -13,7 +13,7 @@ const projectMemberSchema = new Schema(
       type: Schema.Types.ObjectId,
     },
     role: {
-      default: userRolesEnum.MEMBER,
+      default: userRolesEnum.Member,
       enum: AvailableUserRoles,
       type: String,
     },
