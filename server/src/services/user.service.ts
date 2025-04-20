@@ -10,7 +10,7 @@ const FindUser = async (email: string) => {
 const CreateUser = async (
   email: string,
   password: string,
-  username: string,
+  username: string
 ) => {
   return await UserModel.create({
     email,
@@ -19,7 +19,7 @@ const CreateUser = async (
   });
 };
 
-const addEmailVerificationToken = async (user: unknown) => {
+const AddEmailVerificationToken = async (user: unknown) => {
   if (user instanceof UserModel) {
     const token = UnHashedToken();
     user.emailVerificationToken = token;
@@ -27,7 +27,7 @@ const addEmailVerificationToken = async (user: unknown) => {
   }
 };
 
-const VerifyEmailToken = async (token: string) => {
+const FindUserWithToken = async (token: string) => {
   return await UserModel.findOne({
     emailVerificationExpiry: { $gt: Date.now() },
     emailVerificationToken: token,
@@ -43,10 +43,28 @@ const VerifyUser = async (user: unknown) => {
   }
 };
 
+const ResetPassword = async (user: unknown, resetToken: string) => {
+  if (user instanceof UserModel) {
+    user.forgotPasswordToken = resetToken;
+    user.forgotPasswordExpiry = new Date(Date.now() + 10 * 60 * 1000);
+    return await user.save();
+  }
+};
+
+const SetNewPassword = async (user: unknown, password: string) => {
+  if (user instanceof UserModel) {
+    user.password = password;
+    user.forgotPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
+    return await user.save();
+  }
+};
 export {
-  addEmailVerificationToken,
+  AddEmailVerificationToken,
   CreateUser,
   FindUser,
-  VerifyEmailToken,
+  FindUserWithToken,
+  ResetPassword,
+  SetNewPassword,
   VerifyUser,
 };

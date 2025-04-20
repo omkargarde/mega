@@ -16,6 +16,8 @@ const USER_MESSAGES = {
   EmailNotVerified: "Email is not verified",
   FailedUserCreation: "Failed to create user",
   FailedUserTokenCreation: "Failed to create email verification token",
+  ForgotPassword: "User sent password reset link",
+  forgotPasswordSuccess: "Password has been updated successfully",
   SucceededUserCreation: "User register successfully, Please verify your email",
   TokenNotFound: "Token not found",
   UserConflict: "User already exists",

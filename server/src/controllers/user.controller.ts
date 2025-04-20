@@ -2,8 +2,6 @@
 import type { CookieOptions, Request, Response } from "express";
 
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
-import nodemailer from "nodemailer";
 
 import type { ICustomRequest } from "../types/custom-request.types.ts";
 import type { IUserRequestBody } from "../types/user.type.ts";
@@ -11,14 +9,21 @@ import type { IUserRequestBody } from "../types/user.type.ts";
 import { HTTP_STATUS_CODES } from "../constants/status.constant.ts";
 import { USER_MESSAGES, UserToken } from "../constants/user.constant.ts";
 import { UserModel } from "../models/user.model.ts";
-import { sendVerificationTokenMail } from "../services/mail.service.ts";
+import {
+  SendForgotPasswordTokenMail,
+  SendVerificationTokenMail,
+} from "../services/mail.service.ts";
 import {
   FlushJwtCookieOptions,
   GenerateAccessToken,
   GetJwtCookieOptions,
+  UnHashedToken,
 } from "../services/token.service.ts";
 import {
-  addEmailVerificationToken,
+  AddEmailVerificationToken,
+  FindUserWithToken,
+  ResetPassword,
+  SetNewPassword,
   VerifyUser,
 } from "../services/user.service.ts";
 import { ApiResponse } from "../utils/api-response.util.ts";
@@ -50,13 +55,13 @@ const registerUser = async (req: Request, res: Response) => {
       throw new UnprocessableEntityException(USER_MESSAGES.FailedUserCreation);
     }
 
-    await addEmailVerificationToken(user);
+    await AddEmailVerificationToken(user);
 
     if (!user.emailVerificationToken || !user.email) {
       throw new InternalServerErrorException("failed to add token or email");
     }
 
-    await sendVerificationTokenMail(user.emailVerificationToken, user.email);
+    await SendVerificationTokenMail(user.emailVerificationToken, user.email);
 
     res
       .status(HTTP_STATUS_CODES.Ok)
@@ -82,25 +87,17 @@ const verifyUser = async (req: Request, res: Response) => {
   if (!token) {
     throw new BadRequestException(USER_MESSAGES.BadEmailToken);
   }
-  try {
-    const user = await UserModel.findOne({ verificationToken: token });
-    if (!user) {
-      throw new BadRequestException(USER_MESSAGES.BadEmailToken);
-    }
-    await VerifyUser(user);
-
-    res
-      .status(HTTP_STATUS_CODES.Ok)
-      .json(
-        new ApiResponse(
-          HTTP_STATUS_CODES.Ok,
-          "",
-          USER_MESSAGES.VerifiedUserEmail
-        )
-      );
-  } catch (error) {
-    throw new BadRequestException(USER_MESSAGES.BadEmailToken, error);
+  const user = await UserModel.findOne({ verificationToken: token });
+  if (!user) {
+    throw new BadRequestException(USER_MESSAGES.BadEmailToken);
   }
+  await VerifyUser(user);
+
+  res
+    .status(HTTP_STATUS_CODES.Ok)
+    .json(
+      new ApiResponse(HTTP_STATUS_CODES.Ok, "", USER_MESSAGES.VerifiedUserEmail)
+    );
 };
 
 const loginUser = async (req: Request, res: Response) => {
@@ -169,81 +166,46 @@ const logoutUser = (req: Request, res: Response) => {
 const forgotPassword = async (req: Request, res: Response) => {
   //get user by email and send reset token
   const { email } = req.body as IUserRequestBody;
-  if (!email) {
+
+  const user = await UserModel.findOne({ email });
+  if (!user) {
     return res.status(400).json({
-      message: "Email is required",
+      message: "Invalid email",
     });
   }
-  try {
-    const user = await UserModel.findOne({ email });
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid email",
-      });
-    }
-    const resetToken = crypto.randomBytes(32).toString("hex");
-    user.passwordResetToken = resetToken;
-    user.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-    await user.save();
+  const resetToken = UnHashedToken();
+  await ResetPassword(user, resetToken);
 
-    const resetUrl = `${process.env.BASE_URL}/api/v1/users/reset-password/${resetToken}`;
+  await SendForgotPasswordTokenMail(user.email, resetToken);
 
-    const transporter = nodemailer.createTransport({
-      auth: {
-        pass: process.env.MAILTRAP_PASSWORD,
-        user: process.env.MAILTRAP_USERNAME,
-      },
-      host: process.env.MAILTRAP_HOST,
-    });
-    const mailOptions = {
-      from: process.env.MAILTRAP_SENDER_EMAIL,
-      subject: "Reset your password",
-      text: `Please click on the following link to reset your password: ${resetUrl}`,
-      to: user.email,
-    };
-    await transporter.sendMail(mailOptions);
-
-    res.status(200).json({
-      message: "Reset token sent to email",
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: error.message,
-    });
-  }
+  res
+    .status(HTTP_STATUS_CODES.Ok)
+    .json(
+      new ApiResponse(HTTP_STATUS_CODES.Ok, "", USER_MESSAGES.ForgotPassword)
+    );
 };
 
-const resetPassword = async (req, res) => {
+const resetPassword = async (req: Request, res: Response) => {
   //reset password
   const { token } = req.params;
-  const { password } = req.body;
-  if (!token || !password) {
-    return res.status(400).json({
-      message: "All fields are required",
-    });
+  const { password } = req.body as IUserRequestBody;
+  if (!token) {
+    throw new BadRequestException(USER_MESSAGES.BadToken);
   }
-  try {
-    const user = await UserModel.findOne({
-      passwordResetExpires: { $gt: Date.now() },
-      passwordResetToken: token,
-    });
-    if (!user) {
-      return res.status(400).json({
-        message: "Invalid token",
-      });
-    }
-    user.password = password;
-    user.passwordResetToken = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save();
-    res.status(200).json({
-      message: "Password reset successful",
-    });
-  } catch (error) {
-    res.status(400).json({
-      message: error.message,
-    });
+  const user = await FindUserWithToken(token);
+  if (!user) {
+    throw new NotFoundException(USER_MESSAGES.UserNotFound);
   }
+  await SetNewPassword(user, password);
+  res
+    .status(HTTP_STATUS_CODES.Ok)
+    .json(
+      new ApiResponse(
+        HTTP_STATUS_CODES.Ok,
+        "",
+        USER_MESSAGES.forgotPasswordSuccess
+      )
+    );
 };
 
 export {
