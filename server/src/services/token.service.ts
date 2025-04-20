@@ -36,7 +36,7 @@ const UnHashedToken = () => {
 };
 
 const HashedToken = (unHashedToken: crypto.BinaryLike) => {
-  crypto.createHash("sha256").update(unHashedToken).digest("hex");
+  return crypto.createHash("sha256").update(unHashedToken).digest("hex");
 };
 
 const GetJwtCookieOptions = () => {
