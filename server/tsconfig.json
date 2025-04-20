@@ -19,5 +19,5 @@
     "noUnusedParameters": false,
     "noPropertyAccessFromIndexSignature": false
   },
-  "include": ["./src/**/*.ts", "*.ts", "*.config.js"]
+  "include": ["./src/**/*.ts", "*.config.js"]
 }
